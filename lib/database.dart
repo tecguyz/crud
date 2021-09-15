@@ -9,9 +9,43 @@ class Database {
     firestore = FirebaseFirestore.instance;
   }
 
-  Future<void> create(String name, String code) async {
+  Future<bool> signIn(String email, String password) async {
     try {
-      await firestore.collection("countries").add({
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  Future<bool> register(String email, String password) async {
+    try {
+      await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
+      return true;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        print('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        print('The account already exists for that email.');
+      }
+      return false;
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+  Future<void> create(String name, String code) async {
+    CollectionReference users =
+        FirebaseFirestore.instance.collection('countries');
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String uid = auth.currentUser!.uid.toString();
+    try {
+      await users.add({
+        'uid': uid,
         'name': name,
         'code': code,
         'timestamp': FieldValue.serverTimestamp()
@@ -22,11 +56,15 @@ class Database {
   }
 
   Future<List?> read() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String? uid = auth.currentUser?.uid.toString();
     QuerySnapshot querySnapshot;
     List docs = [];
     try {
-      querySnapshot =
-          await firestore.collection('countries').orderBy('timestamp').get();
+      querySnapshot = FirebaseFirestore.instance
+          .collection('countries')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .snapshots() as QuerySnapshot<Object?>;
       if (querySnapshot.docs.isNotEmpty) {
         for (var doc in querySnapshot.docs.toList()) {
           Map a = {
