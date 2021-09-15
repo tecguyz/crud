@@ -4,23 +4,19 @@ import 'package:flutter/material.dart';
 
 import 'database.dart';
 
-class View extends StatefulWidget {
-  View({Key? key, required this.country, required this.db}) : super(key: key);
-  Map country;
+class Add extends StatefulWidget {
+  Add({Key? key, required this.db}) : super(key: key);
   Database db;
   @override
-  _ViewState createState() => _ViewState();
+  _AddState createState() => _AddState();
 }
 
-class _ViewState extends State<View> {
+class _AddState extends State<Add> {
   TextEditingController nameController = new TextEditingController();
   TextEditingController codeController = new TextEditingController();
   @override
   void initState() {
     super.initState();
-    print(widget.country);
-    nameController.text = widget.country['name'];
-    codeController.text = widget.country['code'];
   }
 
   @override
@@ -29,13 +25,13 @@ class _ViewState extends State<View> {
       backgroundColor: Color.fromRGBO(56, 75, 49, 1.0),
       appBar: AppBar(
         backgroundColor: Color.fromRGBO(56, 75, 49, 1.0),
-        title: Text("Country View"),
+        title: Text("Country Add"),
         actions: [
           IconButton(
-              icon: const Icon(Icons.delete),
+              icon: Icon(Icons.delete),
               onPressed: () {
-                widget.db.delete(widget.country["id"]);
-                Navigator.pop(context, true);
+                // widget.db.delete(widget.country["id"]);
+                // Navigator.pop(context, true);
               })
         ],
       ),
@@ -49,28 +45,27 @@ class _ViewState extends State<View> {
                 decoration: inputDecoration("Country Name"),
                 controller: nameController,
               ),
-              const SizedBox(
+              SizedBox(
                 height: 20,
               ),
               TextFormField(
                 style: TextStyle(color: Colors.white),
-                controller: codeController,
                 decoration: inputDecoration("Country Code"),
+                controller: codeController,
               ),
             ],
           ),
         ),
       ),
       bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         color: Colors.transparent,
         child: BottomAppBar(
           color: Colors.transparent,
           child: RaisedButton(
               color: Colors.black,
               onPressed: () {
-                widget.db.update(widget.country['id'], nameController.text,
-                    codeController.text);
+                widget.db.create(nameController.text, codeController.text);
                 Navigator.pop(context, true);
               },
               child: Text(
@@ -94,7 +89,7 @@ class _ViewState extends State<View> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(25.0),
-        borderSide: const BorderSide(
+        borderSide: BorderSide(
           color: Colors.black,
           width: 2.0,
         ),

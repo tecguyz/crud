@@ -1,3 +1,4 @@
+import 'package:crud/add.dart';
 import 'package:crud/database.dart';
 import 'package:crud/view.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -74,7 +75,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         builder: (context) => View(
                               country: docs[index],
                               db: db,
-                            )));
+                            ))).then((value) => {
+                      if (value != null) {initialise()} // if threr are valuse
+                    });
               },
               contentPadding: const EdgeInsets.only(right: 30.2, left: 36),
               title: Text(docs[index]['name']),
@@ -84,7 +87,13 @@ class _MyHomePageState extends State<MyHomePage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Add(db: db)))
+              .then((value) => {
+                    if (value != null) {initialise()}
+                  });
+        },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
